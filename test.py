@@ -25,8 +25,11 @@ class alien:
         
     def movement(self):
         canevas.move(self.rectangle, self.x, self.y)  
+        coords = canevas.coords(self.rectangle)
+        if len(coords) == 0:
+            return()
         canevas.after(100,self.movement)
-        x0, y0, x1, y1 = canevas.coords(self.rectangle)
+        x0, y0, x1, y1 = coords
         if x1>self.limitD:
             self.x=-10
         if x0<self.limitG:
@@ -66,6 +69,15 @@ class balle:
         
     def tir(self):
         x0, y0, x1, y1 = canevas.coords(self.obu)
+        x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[1].rectangle)
+        if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (ennemis[1].rectangle,):
+            a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
+            print(a)
+            canevas.delete(a[0])
+            del ennemis[1]
+            canevas.delete(self.obu)
+
+            return(None)
         traj=-10
         canevas.move(self.obu, 0, traj)
         canevas.after(10,self.tir)
@@ -73,16 +85,19 @@ class balle:
         
 numtir=10
 
-def fcttir(event):
-    global numtir
-    ballez=balle()
-    ballez.tir() 
-    x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[1].rectangle)
-    x0, y0, x1, y1 = canevas.coords(ballez.obu)
-    if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (2,):
-        a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
-        print(a)
-    return()
+# def fcttir(event):
+#     global numtir
+#     ballez=balle()
+#     ballez.tir() 
+#     x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[1].rectangle)
+#     x0, y0, x1, y1 = canevas.coords(ballez.obu)
+#     #if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (2,):
+#     if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (2,):
+
+#         a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
+#         print(a)
+#         canevas.delete(a[0])
+#     return()
 
 
 
@@ -101,7 +116,7 @@ def colision():
   
 largeur = 600
 hauteur = 400
-dif=8
+dif=6
     
     
 mw = Tk() 
@@ -133,7 +148,7 @@ vaisseau = vaisseau(300)
 
 mw.bind("<KeyPress-Left>", lambda e: vaisseau.left(e))
 mw.bind("<KeyPress-Right>", lambda e: vaisseau.right(e))
-mw.bind("<KeyPress-Up>", fcttir)
+mw.bind("<KeyPress-Up>", lambda e: balle().tir())
 mw.bind("<KeyPress-Down>", kill)
 
 
