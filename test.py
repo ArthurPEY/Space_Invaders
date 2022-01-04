@@ -69,15 +69,16 @@ class balle:
         
     def tir(self):
         x0, y0, x1, y1 = canevas.coords(self.obu)
-        x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[1].rectangle)
-        if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (ennemis[1].rectangle,):
-            a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
-            print(a)
-            canevas.delete(a[0])
-            del ennemis[1]
-            canevas.delete(self.obu)
-
-            return(None)
+        for k in range(len(ennemis)):
+            x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[k].rectangle)
+            if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (ennemis[k].rectangle,):
+                a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
+                print(a)
+                canevas.delete(a[0])
+                del ennemis[k]
+                canevas.delete(self.obu)
+                print(len(ennemis))
+                return(None)
         traj=-10
         canevas.move(self.obu, 0, traj)
         canevas.after(10,self.tir)
