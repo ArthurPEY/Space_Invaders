@@ -62,25 +62,41 @@ class balle:
         x0, y0, x1, y1 = canevas.coords(vaisseau.vaisseau)
         self.x = x0
         self.y = y0
-        self.rectangle = canevas.create_rectangle( x0, y0, x1, y1, fill = "black")
+        self.obu = canevas.create_oval( ((x0+x1)/2)-2, y0, ((x0+x1)/2)+2, y1, fill = "black")
         
-    def tir(self,event):
-        x0, y0, x1, y1 = canevas.coords(self.rectangle)
-        canevas.move(self.rectangle, self.x, self.y)  
-        canevas.after(100,self.tir(event))
-        
-        self.y=-1
-        
-def fcttir(event):
-    ballez=balle()
-    ballez.tir(event)    
+    def tir(self):
+        x0, y0, x1, y1 = canevas.coords(self.obu)
+        traj=-10
+        canevas.move(self.obu, 0, traj)
+        canevas.after(10,self.tir)
      
+        
+numtir=10
 
-def kill():
+def fcttir(event):
+    global numtir
+    ballez=balle()
+    ballez.tir() 
+    x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[1].rectangle)
+    x0, y0, x1, y1 = canevas.coords(ballez.obu)
+    if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (2,):
+        a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
+        print(a)
+    return()
+
+
+
+def kill(k,event):
     global alienz
     global alienzmov
-    idobj=alienz.rectangle
+    idobj=ennemis[k].rectangle
     canevas.delete("{}".format(idobj))
+    return()
+
+def colision():
+    global ballez
+    x0, y0, x1, y1 = canevas.coords(ballez.obu)
+    print(x0, y0, x1, y1)
     return()
   
 largeur = 600
@@ -93,13 +109,13 @@ mw = Tk()
 canevas=Canvas(mw, width=600, height=400, bg="ivory")
 canevas.pack(padx=50, pady=50)
 ennemis=[]
-# for k in range(0,dif):
-#     alienz=alien((dif-k)*50,(dif-k)*50,largeur-k*50).movement()
+for k in range(0,dif):
+    alienz=alien((dif-k)*50,(dif-k)*50,largeur-k*50)
+    ennemis.append(alienz)
+    alienz.movement()
     
-#     ennemis.append(alienz)
-    
-alienz=alien(50,50,500)
-alienzmov=alienz.movement()
+# alienz=alien(50,50,500)
+# alienzmov=alienz.movement()
 
 
 
@@ -118,9 +134,11 @@ vaisseau = vaisseau(300)
 mw.bind("<KeyPress-Left>", lambda e: vaisseau.left(e))
 mw.bind("<KeyPress-Right>", lambda e: vaisseau.right(e))
 mw.bind("<KeyPress-Up>", fcttir)
+mw.bind("<KeyPress-Down>", kill)
 
 
 print(canevas.coords(vaisseau.vaisseau))
+print(ennemis)
 
 mainloop()
 
