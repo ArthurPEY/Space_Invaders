@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Dec 14 08:48:01 2021
-
-@author: Arthur
+Auteur : Arthur PEY - Juan REYES-ORTIZ
+Que fait le programme : Jeu du Space Invaders
+Date :  20/01/2022
+Todo : Impossible de relancer une partie; Une erreur "TclError: image "pyimage59" doesn't exist" 
+peut apparaitre, il faut relancer l'editeur de code/console.
 """
 import time
 from tkinter import *
@@ -112,7 +114,7 @@ class balle:
             canevas.delete(self.obu)
             return() 
         
-        
+        checkend()
         traj=-10
         canevas.move(self.obu, 0, traj)
         canevas.after(10,self.tir)
@@ -169,20 +171,6 @@ class laseralien:
         
 numtir=10
 
-# def fcttir(event):
-#     global numtir
-#     ballez=balle()
-#     ballez.tir() 
-#     x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[1].rectangle)
-#     x0, y0, x1, y1 = canevas.coords(ballez.obu)
-#     #if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (2,):
-#     if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (2,):
-
-#         a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
-#         print(a)
-#         canevas.delete(a[0])
-#     return()
-
 def bridetir(event):
     global filetir
     if len(filetir)<3:
@@ -219,11 +207,17 @@ def boucle_tir_alien():
     
 def checkend():
     global gameover
-    vie=vievaisseau.get()
+    global ennemis
+    global win
+    vie=vaisseau.vie
     if int(vie)==0:
         canevas=Canvas(mw, width=600, height=400, bg="ivory")
         canevas.grid(row = 1, column = 1, rowspan = 7, sticky = 'nesw')
         canevas.create_image(0,0,anchor=NW,image=gameover)
+    elif len(ennemis) == 0:
+        canevas=Canvas(mw, width=600, height=400, bg="ivory")
+        canevas.grid(row = 1, column = 1, rowspan = 7, sticky = 'nesw')
+        canevas.create_image(0,0,anchor=NW,image=win)
         
         
 def identite():
@@ -264,6 +258,7 @@ imgvais = PhotoImage(file = 'vaisseau.gif')
 imgalien = PhotoImage(file = 'alien.gif')
 imgback = PhotoImage(file = 'back.gif')
 imgindex = PhotoImage(file = 'index.gif')
+win = PhotoImage(file = 'win.gif')
 gameover = PhotoImage(file = 'over.gif')
 canevas.create_image(0,0,anchor=NW,image=imgindex)
 
