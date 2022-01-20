@@ -13,7 +13,7 @@ scoreint=0
 class testobj:
     def __init(self):
         self.x=x
-
+#creation de la classe alien
 class alien: 
     def __init__(self,start,hauteur,limitG,limitD): 
         img = PhotoImage(file = "alien.gif")
@@ -21,19 +21,21 @@ class alien:
         self.x = 10
         self.y = 0
         self.hauteur = hauteur
+#création du canvas de l'alien 
         self.rectangle = canevas.create_image(start, hauteur,anchor = NW,image= img) 
+#mise en place des limites de déplacement
         self.limitD = limitD
         self.limitG = limitG
         
 
-        
+ #fonction du mouvement de l'alien       
     def movement(self):
         canevas.move(self.rectangle, self.x, self.y)  
-        coords = canevas.coords(self.rectangle)
+        coords = canevas.coords(self.rectangle)  #on récupère les coordonnées de l'alien 
         self.y=0
         if len(coords) == 0:
             return()
-        canevas.after(100,self.movement)
+        canevas.after(100,self.movement) # après 0,1s, l'alien bouge de 10 pixels
         x0, y0, x1, y1 = coords
         if x1>self.limitD:
             self.x=-10
@@ -43,16 +45,16 @@ class alien:
             self.y=10
     
         
-
+#creation de la classe vaisseau
 class vaisseau:
     def __init__(self,start): 
         self.x = 0
         self.y = 0
         self.vaisseau = canevas.create_rectangle( start, 370, start+45, 390, fill = "red")
-        self.vie = 10
+        self.vie = 10 #points de vie du vaisseau
 
 
-    def left(self, event):
+    def left(self, event): #fonction du déplacement vers la gauche
         x0, y0, x1, y1 = canevas.coords(self.vaisseau)
         if x0 > 5:
             self.x = -5
@@ -60,16 +62,16 @@ class vaisseau:
             canevas.move(self.vaisseau, self.x, self.y)
         
          
-    def right(self, event):
+    def right(self, event): #fonction du déplacement vers la droite 
         x0, y0, x1, y1 = canevas.coords(self.vaisseau)
         if x1<595:
             self.x = 5
             self.y = 0
             canevas.move(self.vaisseau, self.x, self.y)
           
-filetir=[]
+filetir=[] #ici on crée une file qui relève le nombre de tirs presents sur le jeu
             
-class balle:   
+class balle:  #classe assigné à la balle lancé par le vaisseau
     def __init__(self):
         x0, y0, x1, y1 = canevas.coords(vaisseau.vaisseau)
         self.x = x0
@@ -83,17 +85,17 @@ class balle:
         global blocs
         x0, y0, x1, y1 = canevas.coords(self.obu)
         for k in range(len(ennemis)):
-            x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[k].rectangle)
+            x0alien, y0alien, x1alien, y1alien = canevas.coords(ennemis[k].rectangle) #on relève les coordonnées du k-ieme alien sur le jeu
             if canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien) != (ennemis[k].rectangle,):
                 a=canevas.find_overlapping(x0alien, y0alien, x1alien, y1alien)
                 print(a)
                 canevas.delete(a[0])
                 del ennemis[k]
-                canevas.delete(self.obu)
+                canevas.delete(self.obu) #quand on touche un enemi avec l'obus,  celui ci s'efface 
                 print(len(ennemis))
-                filetir.pop(0)
+                filetir.pop(0) #on enleve le tir qui a touché l'ennemi de la file
                 return(None)
-        
+        #ici on applique le même code au murs de protection 
         for k in range(len(blocs)):
             for p in range(len(blocs[k])):
                 x0bloc, y0bloc, x1bloc, y1bloc = canevas.coords(blocs[k][p].bloc)
