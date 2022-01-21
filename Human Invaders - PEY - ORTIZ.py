@@ -148,14 +148,17 @@ class laseralien:
     def tir(self):
         breakcond=0
         global blocs
-        x0, y0, x1, y1 = canevas.coords(self.laser) #coordonnées du laser
+        #coordonnées du laser
+        x0, y0, x1, y1 = canevas.coords(self.laser)
         x0vaisseau, y0vaisseau= canevas.coords(vaisseau.vaisseau)
         #si le laser alien se superpose au vaisseau
         if canevas.find_overlapping(x0vaisseau, y0vaisseau, x0vaisseau+45, y0vaisseau+25) == (1,2,self.laser):
             vaisseau.vie=vaisseau.vie-1 #on enleve une vie 
             vievaisseau.set(vaisseau.vie)
-            vieCounter() #on relance la fontion vieCounter pour sauvegarder le nombre de vies dans le jeu
-            checkend() #on vérifie que le joueur si n'a plus de vies
+             #on relance la fontion vieCounter pour sauvegarder le nombre de vies dans le jeu
+            vieCounter()
+            #on vérifie que le joueur si n'a plus de vies
+            checkend() 
             canevas.delete(self.laser) #on efface le laser
             del self.laser
             print("touche") #////
@@ -163,6 +166,7 @@ class laseralien:
         elif y1 > 800: #si le laser est hors de l'écran on l'efface
             del self.laser 
             return()
+        
         #cette boucle for , sert a déterminer si le laser alien touche un mur de protection
         for k in range(len(blocs)):
             for p in range(len(blocs[k])):
@@ -183,8 +187,10 @@ class laseralien:
         
 numtir=10 #initialisation du nombre de tirs 
 
+#cette fontion sert a ajouter du "delay" chaque 3 tir pour eviter le tir répétitif
 def bridetir(event):
     global filetir
+    #on utilise la file définie précedenment
     if len(filetir)<3:
         filetir.append("OBU")
         balle().tir()
@@ -202,10 +208,13 @@ def colision():
     x0, y0, x1, y1 = canevas.coords(ballez.obu)
     print(x0, y0, x1, y1)
     return()
-  
+ 
+#hauteur du canvas
 largeur = 600
 hauteur = 400
-    
+ 
+#cette fontion définit aléatoirement à quel instant un des aliens tire entre 2s et 3s, 
+#puis on sélectionne aléatoirement l'alien en question
 def boucle_tir_alien():
     delay=random.randint(2000,3000)
     canevas.after(delay,boucle_tir_alien)
@@ -213,20 +222,23 @@ def boucle_tir_alien():
     laser=laseralien(idalien)
     laser.tir()
 
+    #///
     for k in range(0,dif):
         canevas.delete(3*dif + 30 + k)
     return()
-    
+
+#fontion de fin de partie    
 def checkend():
     global gameover
     global ennemis
     global win
+    #on récupère les points de vie du joueur
     vie=vaisseau.vie
-    if int(vie)==0:
+    if int(vie)==0: #si le joueur n'a plus de vies
         canevas=Canvas(mw, width=600, height=400, bg="ivory")
         canevas.grid(row = 1, column = 1, rowspan = 7, sticky = 'nesw')
         canevas.create_image(0,0,anchor=NW,image=gameover)
-    elif len(ennemis) == 0:
+    elif len(ennemis) == 0: #s'il n'y a plus d'ennemis
         canevas=Canvas(mw, width=600, height=400, bg="ivory")
         canevas.grid(row = 1, column = 1, rowspan = 7, sticky = 'nesw')
         canevas.create_image(0,0,anchor=NW,image=win)
@@ -236,36 +248,41 @@ def identite():
     """Affichage de l'identité du créateur du programme"""
     messagebox.showinfo("A propos", "programme crée par Arthur PEY et Juan REYES-ORTIZ")
     return()
-
+#compteur de score
 def scoreCounter():
     global scoreint
     score.set('Votre score :' + str(scoreint))
     
+#conteur de points de vies    
 def vieCounter():
     vie = vaisseau.vie
     vievaisseau.set('Vie :' + str(vie))
 
+#création de la fenetre tkinter
 mw = Tk()
 mw.title('Space invaders')
 mw.geometry("{0}x{1}+0+0".format(mw.winfo_screenwidth(), mw.winfo_screenheight()))
 
-
+#affichage du label du score
 score = StringVar()
 scoreCounter()
 labelScore = Label (mw, textvariable = score, fg = 'red')
 
+#difficultée predeterminée
 dif = 5
 
+#difficulté "hard"
 def hard():
     global dif
     dif=9
-
+#difficultée "easy"
 def easy():
     global dif
     dif=5
-    
+#création du canvas du menu du jeu   
 canevas=Canvas(mw, width=600, height=400, bg="ivory")
 canevas.grid(row = 1, column = 1, rowspan = 7, sticky = 'nesw')
+#chargment des images
 imgvais = PhotoImage(file = 'vaisseau.gif')
 imgalien = PhotoImage(file = 'alien.gif')
 imgback = PhotoImage(file = 'back.gif')
@@ -275,7 +292,7 @@ gameover = PhotoImage(file = 'over.gif')
 canevas.create_image(0,0,anchor=NW,image=imgindex)
 
 
-
+#fonction qui sert à démarrer le jeu
 def demarrer():
     global vaisseau
     global canevas
@@ -285,6 +302,7 @@ def demarrer():
     global scoreint
     canevas.delete('all')
     
+    #création de la zone de jeu
     canevas=Canvas(mw, width=600, height=400, bg="ivory")
     canevas.grid(row = 1, column = 1, rowspan = 7, sticky = 'nesw')
     canevas.create_image(0,0,anchor=NW,image=imgback)
@@ -295,12 +313,14 @@ def demarrer():
     ennemis=[]
     vieCounter()
     
+    #boucle for qui sert à la création des aliens selon la difficultée choissi
     for n in range (0,3):
         for k in range(0,dif):
             alienz=alien((dif-k)*50,5+(n*40),(dif-k-1)*50,largeur-k*50)
             ennemis.append(alienz)
             alienz.movement()
             
+    #creation des listes vides pour la mise en place des mur de protection        
     blocs=[]
     colonne=[]
     for k in range(0,3):
@@ -310,13 +330,14 @@ def demarrer():
                 colonne.append(base(70+(p*31)+k*185,300-(i*31)))
             blocs.append(colonne)
                 
-        
+    #///   
     for k in range(dif):
         laseralien(k)    
-
+        
+    #on relance la boucle des tirs alien
     boucle_tir_alien()
 
-
+    #ici on code la détection des touches du clavier
     mw.bind("<KeyPress-Left>", lambda e: vaisseau.left(e))
     mw.bind("<KeyPress-Right>", lambda e: vaisseau.right(e))
     mw.bind("<KeyPress-Up>", lambda e: bridetir(e))
