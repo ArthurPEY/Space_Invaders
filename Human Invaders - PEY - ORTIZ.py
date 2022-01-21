@@ -11,9 +11,10 @@ from tkinter import *
 from PIL import ImageTk
 import random
 
+#score initialisée
 scoreint=0
 
-
+#création de la classe alien
 class alien: 
     def __init__(self,start,hauteur,limitG,limitD): 
         global imgalien
@@ -22,20 +23,22 @@ class alien:
         self.y = 0
         self.hauteur = hauteur
         self.rectangle = canevas.create_image( start, hauteur,anchor=NW,image=imgalien) 
+        #on met en place les limites de déplacement des aliens
         self.limitD = limitD
         self.limitG = limitG
         
 
-        
+     #fonction qui définit le mouvement de l'alien   
     def movement(self):
         canevas.move(self.rectangle, self.x, self.y)  
+        #on récupere les coordonnées
         coords = canevas.coords(self.rectangle)
         self.y=0
-        if len(coords) == 0:
+        if len(coords) == 0:  #///
             return()
-        canevas.after(100,self.movement)
+        canevas.after(100,self.movement) #on relance la fonction tous les 0,1 s
         x0, y0 = coords
-        if x0 + 25>self.limitD:
+        if x0 + 25>self.limitD: #si les aliens n'ont pas atteint la limite, ils se deplacent de 10 pixels
             self.x=-10
             self.y=10
         if x0<self.limitG:
@@ -43,24 +46,24 @@ class alien:
             self.y=10
     
         
-
+#on définit la classe du vaisseau
 class vaisseau:
     def __init__(self,start):
         global imgvais
         self.x = 0
         self.y = 0
         self.vaisseau = canevas.create_image(start,370,anchor=NW,image=imgvais)
-        self.vie = 3
+        self.vie = 3 #points de vie du vaisseau
 
-
+    #fonction du déplacement vers la gauche
     def left(self, event):
         x0, y0 = canevas.coords(self.vaisseau)
-        if x0 > 5:
+        if x0 > 5: # 5 pixels étant la limite de déplacement vers la gauche
             self.x = -5
             self.y = 0
             canevas.move(self.vaisseau, self.x, self.y)
         
-         
+    #fonction du déplacement vers la droite     
     def right(self, event):
         x0, y0= canevas.coords(self.vaisseau)
         if x0 + 45 <595:
@@ -68,15 +71,17 @@ class vaisseau:
             self.y = 0
             canevas.move(self.vaisseau, self.x, self.y)
           
-filetir=[]
-            
+filetir=[] #création d'une file dont on va rentrer le nombre de tirs présents sur le jeu
+  
+#création de la balle lancée par le vaisseau
 class balle:   
     def __init__(self):
+        #on réupere les coordonnées du vaisseau 
         x0, y0 = canevas.coords(vaisseau.vaisseau)
         self.x = x0
         self.y = y0
         self.obu = canevas.create_oval( ((x0+x0+45)/2)-2, y0, ((x0+x0+45)/2)+2, y0+25, fill = "green")
-        
+ #fontion qui définit le comportement du tir lancé       
     def tir(self):
         breakcond=0
         global scoreint
@@ -85,18 +90,19 @@ class balle:
         global blocs
         x0, y0, x1, y1 = canevas.coords(self.obu)
         
-        for k in range(len(ennemis)):
-            x0alien, y0alien = canevas.coords(ennemis[k].rectangle)
+        for k in range(len(ennemis)): 
+            x0alien, y0alien = canevas.coords(ennemis[k].rectangle) #on récupere les coordonnées du k-ieme alien
+            #si les coordonnees de l'obus et de l'alien sont égales
             if canevas.find_overlapping(x0alien, y0alien, x0alien+25, y0alien+25) == (1,ennemis[k].rectangle,self.obu):
                 a=canevas.find_overlapping(x0alien, y0alien, x0alien+25, y0alien+25)
-                canevas.delete(a[1])
+                canevas.delete(a[1]) #on efface l'alien touché
                 del ennemis[k]
-                scoreint = scoreint + 10
+                scoreint = scoreint + 10 #on augmente le score
                 scoreCounter()
-                canevas.delete(self.obu)
-                filetir.pop(0)
+                canevas.delete(self.obu) #on efface l'obus
+                filetir.pop(0) #on "pop" le tir qui a été lancé, de sa liste
                 return(None)
-        
+        #la boucle for suivante a le meme fonctionnement que la précedente pour les murs de protection
         for k in range(len(blocs)):
             for p in range(len(blocs[k])):
                 x0bloc, y0bloc, x1bloc, y1bloc = canevas.coords(blocs[k][p].bloc)
@@ -108,50 +114,56 @@ class balle:
                     canevas.delete(a[1])
                     blocs[k].pop(0)
                     del self.obu
+                    
+        #si le laser est hors de l'écran de jeu 
         if y1 < -10:
-            filetir.pop(0)
+            filetir.pop(0) #on efface le laser
             del self.obu
             canevas.delete(self.obu)
-            return() 
+            return()
         
+        #on vérifie si le joueur a fini la partie
         checkend()
         traj=-10
         canevas.move(self.obu, 0, traj)
         canevas.after(10,self.tir)
         
-
+#création des bases de protection
 class base:
     def __init__(self,x,y):
         self.x = x
         self.y = y
         self.bloc = canevas.create_rectangle( x, y, x+30, y+30, fill = "orange") 
 
-
+#classe qui définit le laser des aliens
 class laseralien:   
     def __init__(self,idalien):
-        x0, y0 = canevas.coords(ennemis[idalien].rectangle)
-        x0vaisseau, y0vaisseau = canevas.coords(vaisseau.vaisseau)
+        x0, y0 = canevas.coords(ennemis[idalien].rectangle) #on récupere les coordonnées des aliens
+        x0vaisseau, y0vaisseau = canevas.coords(vaisseau.vaisseau) #on récupère les coordonnées du vaisseau
         self.x = x0
         self.y = y0
         self.laser = canevas.create_oval( ((x0+x0+25)/2)-2, y0+25, ((x0+x0+25)/2)+2, y0+50, fill = "red")
     
+    #comportement du laser des aliens
     def tir(self):
         breakcond=0
         global blocs
-        x0, y0, x1, y1 = canevas.coords(self.laser)
+        x0, y0, x1, y1 = canevas.coords(self.laser) #coordonnées du laser
         x0vaisseau, y0vaisseau= canevas.coords(vaisseau.vaisseau)
+        #si le laser alien se superpose au vaisseau
         if canevas.find_overlapping(x0vaisseau, y0vaisseau, x0vaisseau+45, y0vaisseau+25) == (1,2,self.laser):
-            vaisseau.vie=vaisseau.vie-1
+            vaisseau.vie=vaisseau.vie-1 #on enleve une vie 
             vievaisseau.set(vaisseau.vie)
-            vieCounter()
-            checkend()
-            canevas.delete(self.laser)
+            vieCounter() #on relance la fontion vieCounter pour sauvegarder le nombre de vies dans le jeu
+            checkend() #on vérifie que le joueur si n'a plus de vies
+            canevas.delete(self.laser) #on efface le laser
             del self.laser
-            print("touche")
+            print("touche") #////
             return(None)
-        elif y1 > 800:
-            del self.laser
+        elif y1 > 800: #si le laser est hors de l'écran on l'efface
+            del self.laser 
             return()
+        #cette boucle for , sert a déterminer si le laser alien touche un mur de protection
         for k in range(len(blocs)):
             for p in range(len(blocs[k])):
                 x0bloc, y0bloc, x1bloc, y1bloc = canevas.coords(blocs[k][p].bloc)
@@ -169,7 +181,7 @@ class laseralien:
         canevas.after(10,self.tir)
      
         
-numtir=10
+numtir=10 #initialisation du nombre de tirs 
 
 def bridetir(event):
     global filetir
