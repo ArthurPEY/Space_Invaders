@@ -104,7 +104,7 @@ class balle:
                 scoreint = scoreint + 10 #on augmente le score
                 scoreCounter() #actualisation graphique du score
                 canevas.delete(self.obu) #on efface l'obus (sur canvas)
-                filetir.pop(0) #on "pop" le tir qui a été lancé de sa PILE
+                filetir.pop(0) #on "pop" le tir qui a été lancé de sa FILE
                 return(None)
         #la boucle for suivante à le même fonctionnement que la précedente pour les murs de protection
         for k in range(len(blocs)):
@@ -121,7 +121,7 @@ class balle:
                     
         
         if y1 < -10:  #si le laser est hors de l'écran de jeu 
-            filetir.pop(0) #on retire le laser de la PILE
+            filetir.pop(0) #on retire le laser de la FILE
             canevas.delete(self.obu) #efface l'obu du canvas
             del self.obu #suppresion de l'objet
             return()
